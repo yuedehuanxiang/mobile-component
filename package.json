@@ -1,0 +1,24 @@
+{
+  "name": "deepseek-test",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Vue 2 + Vite mobile component project with 375-based rem adaptation",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "dev:host": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "amfe-flexible": "^2.2.1",
+    "vue": "^2.7.16",
+    "vue-router": "^3.6.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue2": "^2.3.3",
+    "less": "^4.6.4",
+    "postcss-pxtorem": "^6.1.0",
+    "vite": "^5.4.0"
+  }
+}
