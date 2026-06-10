@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Release Builder</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Mobile Component Release</p>
+          <h1>发布分支打包工具</h1>
+        </div>
+        <div class="status-pill" id="statusPill">准备中</div>
+      </section>
+
+      <section class="workspace">
+        <div class="panel control-panel">
+          <div class="meta-grid">
+            <div class="meta-item">
+              <span>当前分支</span>
+              <strong id="currentBranch">-</strong>
+            </div>
+            <div class="meta-item">
+              <span>发布分支</span>
+              <strong id="releaseBranch">-</strong>
+            </div>
+          </div>
+
+          <label class="branch-label" for="branchInput">
+            <span>需要合并的分支</span>
+            <small>支持换行或逗号分隔，按输入顺序合并。</small>
+          </label>
+          <textarea
+            id="branchInput"
+            rows="9"
+            spellcheck="false"
+            placeholder="feature/login&#10;feature/payment, fix/navbar"
+          ></textarea>
+
+          <div class="actions">
+            <button type="button" id="refreshButton" class="secondary">刷新状态</button>
+            <button type="button" id="startButton" class="primary">开始打包</button>
+          </div>
+        </div>
+
+        <div class="panel log-panel">
+          <div class="log-header">
+            <div>
+              <span>执行日志</span>
+              <strong id="resultText">等待开始</strong>
+            </div>
+            <button type="button" id="clearButton" class="ghost">清空</button>
+          </div>
+          <pre id="logOutput" aria-live="polite"></pre>
+        </div>
+      </section>
+    </main>
+
+    <script src="./renderer.js"></script>
+  </body>
+</html>
