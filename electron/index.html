@@ -19,6 +19,10 @@
       <section class="workspace">
         <div class="panel control-panel">
           <div class="meta-grid">
+            <div class="meta-item meta-item--path">
+              <span>项目路径</span>
+              <strong id="projectPath">-</strong>
+            </div>
             <div class="meta-item">
               <span>当前分支</span>
               <strong id="currentBranch">-</strong>
@@ -41,6 +45,7 @@
           ></textarea>
 
           <div class="actions">
+            <button type="button" id="selectProjectButton" class="secondary">选择项目目录</button>
             <button type="button" id="refreshButton" class="secondary">刷新状态</button>
             <button type="button" id="startButton" class="primary">开始打包</button>
           </div>

@@ -1,12 +1,16 @@
+const projectPathEl = document.querySelector('#projectPath')
 const currentBranchEl = document.querySelector('#currentBranch')
 const releaseBranchEl = document.querySelector('#releaseBranch')
 const statusPillEl = document.querySelector('#statusPill')
 const branchInputEl = document.querySelector('#branchInput')
 const startButtonEl = document.querySelector('#startButton')
 const refreshButtonEl = document.querySelector('#refreshButton')
+const selectProjectButtonEl = document.querySelector('#selectProjectButton')
 const clearButtonEl = document.querySelector('#clearButton')
 const logOutputEl = document.querySelector('#logOutput')
 const resultTextEl = document.querySelector('#resultText')
+
+let selectedProjectPath = ''
 
 function appendLog(line) {
   const time = new Date().toLocaleTimeString('zh-CN', { hour12: false })
@@ -17,6 +21,7 @@ function appendLog(line) {
 function setBusy(isBusy) {
   startButtonEl.disabled = isBusy
   refreshButtonEl.disabled = isBusy
+  selectProjectButtonEl.disabled = isBusy
   branchInputEl.disabled = isBusy
   startButtonEl.textContent = isBusy ? '打包中...' : '开始打包'
   statusPillEl.textContent = isBusy ? '执行中' : '准备就绪'
@@ -25,7 +30,12 @@ function setBusy(isBusy) {
 
 async function refreshStatus() {
   try {
-    const status = await window.releaseBuilder.getStatus()
+    const status = await window.releaseBuilder.getStatus(selectedProjectPath)
+    if (status.projectRoot) {
+      selectedProjectPath = status.projectRoot
+      projectPathEl.textContent = selectedProjectPath
+      projectPathEl.title = selectedProjectPath
+    }
     currentBranchEl.textContent = status.currentBranch || '-'
     releaseBranchEl.textContent = status.releaseBranch || '-'
     resultTextEl.textContent = status.isGitRepository ? '等待开始' : '当前目录不是 Git 仓库'
@@ -43,13 +53,35 @@ window.releaseBuilder.onLog(line => {
   appendLog(line)
 })
 
+selectProjectButtonEl.addEventListener('click', async () => {
+  try {
+    const result = await window.releaseBuilder.selectProject()
+    if (result.projectPath) {
+      selectedProjectPath = result.projectPath
+      projectPathEl.textContent = selectedProjectPath
+      projectPathEl.title = selectedProjectPath
+    }
+
+    if (!result.canceled) {
+      appendLog(`已选择项目目录：${selectedProjectPath}`)
+    }
+
+    await refreshStatus()
+  } catch (error) {
+    appendLog(error.message || '选择项目目录失败。')
+  }
+})
+
 startButtonEl.addEventListener('click', async () => {
   logOutputEl.textContent = ''
   resultTextEl.textContent = '正在执行'
   setBusy(true)
 
   try {
-    const result = await window.releaseBuilder.start(branchInputEl.value)
+    const result = await window.releaseBuilder.start({
+      projectPath: selectedProjectPath,
+      branches: branchInputEl.value
+    })
 
     if (result.ok) {
       resultTextEl.textContent = `完成：${result.releaseBranch}`

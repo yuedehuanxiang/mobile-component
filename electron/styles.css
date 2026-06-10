@@ -127,6 +127,11 @@ h1 {
   white-space: nowrap;
 }
 
+.meta-item--path strong {
+  direction: rtl;
+  text-align: left;
+}
+
 .branch-label {
   display: grid;
   gap: 6px;

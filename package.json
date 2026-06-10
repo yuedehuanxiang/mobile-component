@@ -11,6 +11,7 @@
     "build": "vite build",
     "electron:dev": "electron .",
     "electron:pack:mac": "electron-builder --mac",
+    "electron:pack:win": "electron-builder --win",
     "preview": "vite preview"
   },
   "build": {
@@ -33,6 +34,22 @@
         "dmg",
         "zip"
       ]
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
     }
   },
   "dependencies": {

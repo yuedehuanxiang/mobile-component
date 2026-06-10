@@ -166,8 +166,9 @@ async function assertCleanWorktree(projectRoot) {
 }
 
 export async function getReleaseStatus(projectRoot) {
+  const resolvedProjectRoot = path.resolve(projectRoot)
   const releaseBranch = getReleaseBranchName()
-  const isGitRepository = await commandSucceeds(projectRoot, 'git', [
+  const isGitRepository = await commandSucceeds(resolvedProjectRoot, 'git', [
     'rev-parse',
     '--is-inside-work-tree'
   ])
@@ -175,6 +176,7 @@ export async function getReleaseStatus(projectRoot) {
   if (!isGitRepository) {
     return {
       isGitRepository,
+      projectRoot: resolvedProjectRoot,
       currentBranch: '',
       releaseBranch
     }
@@ -182,12 +184,14 @@ export async function getReleaseStatus(projectRoot) {
 
   return {
     isGitRepository,
-    currentBranch: await getCurrentBranch(projectRoot),
+    projectRoot: resolvedProjectRoot,
+    currentBranch: await getCurrentBranch(resolvedProjectRoot),
     releaseBranch
   }
 }
 
 export async function runReleaseBuild({ projectRoot, rawBranches, sendLog }) {
+  projectRoot = path.resolve(projectRoot)
   const branches = parseBranches(rawBranches)
   const releaseBranch = getReleaseBranchName()
   const distPath = path.join(projectRoot, 'dist')

@@ -1,14 +1,15 @@
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain } from 'electron'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { getReleaseStatus, runReleaseBuild } from '../scripts/release-build.mjs'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
-const projectRoot = path.resolve(__dirname, '..')
+const defaultProjectRoot = path.resolve(__dirname, '..')
 
 let mainWindow
 let isRunning = false
+let selectedProjectRoot = defaultProjectRoot
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -44,8 +45,32 @@ app.on('window-all-closed', () => {
   }
 })
 
-ipcMain.handle('release:get-status', async () => {
+ipcMain.handle('release:get-status', async (_event, payload) => {
+  const projectRoot = payload?.projectPath || selectedProjectRoot
   return getReleaseStatus(projectRoot)
+})
+
+ipcMain.handle('release:select-project', async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    title: '选择要打包的项目目录',
+    defaultPath: selectedProjectRoot,
+    properties: ['openDirectory']
+  })
+
+  if (result.canceled || result.filePaths.length === 0) {
+    return {
+      canceled: true,
+      projectPath: selectedProjectRoot
+    }
+  }
+
+  selectedProjectRoot = result.filePaths[0]
+
+  return {
+    canceled: false,
+    projectPath: selectedProjectRoot,
+    status: await getReleaseStatus(selectedProjectRoot)
+  }
 })
 
 ipcMain.handle('release:start', async (_event, payload) => {
@@ -56,6 +81,7 @@ ipcMain.handle('release:start', async (_event, payload) => {
     }
   }
 
+  const projectRoot = payload?.projectPath || selectedProjectRoot
   isRunning = true
   const sendLog = line => {
     if (!mainWindow?.isDestroyed()) {
